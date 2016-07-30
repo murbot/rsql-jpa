@@ -43,6 +43,7 @@ import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.PluralAttribute;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -257,7 +258,12 @@ public final class PredicateBuilder {
 	    		}
 	    		case LESS_THAN_OR_EQUAL : {
 	    			Object argument = arguments.get(0);
-	    			return createLessEqual(propertyPath, (Number)argument, manager);
+	    			if(argument instanceof Comparable) {
+	    				return createLessEqualComparable(propertyPath, (Comparable) argument, manager);
+	    			}
+	    			else {
+	    				return createLessEqual(propertyPath, (Number) argument, manager);
+	    			}
 	    		}
 	    		case IN : return createIn(propertyPath, arguments, manager);
 	    		case NOT_IN : return createNotIn(propertyPath, arguments, manager);
@@ -395,6 +401,11 @@ public final class PredicateBuilder {
     private static Predicate createLessEqual(Expression<? extends Number> propertyPath, Number argument, EntityManager manager) {
     	CriteriaBuilder builder = manager.getCriteriaBuilder();
         return builder.le(propertyPath, argument);
+    }
+    
+    private static <T extends Comparable<? super T>> Predicate createLessEqualComparable(Expression<T> propertyPath, T argument, EntityManager manager) {
+    	CriteriaBuilder builder = manager.getCriteriaBuilder();
+        return builder.lessThanOrEqualTo(propertyPath, argument);
     }
 
     /**
