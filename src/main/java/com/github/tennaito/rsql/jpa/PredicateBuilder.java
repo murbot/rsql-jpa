@@ -246,22 +246,33 @@ public final class PredicateBuilder {
 	    		}
 	    		case GREATER_THAN : {
 	    			Object argument = arguments.get(0);
-	    			return createGreaterThan(propertyPath, (Number)argument, manager);
+	    			if(argument instanceof Comparable) {
+	    				return createGreaterThan(propertyPath, (Comparable)argument, manager);
+	    			} else {
+	    				return createGreaterThan(propertyPath, (Number)argument, manager);
+	    			}
 	    		}
 	    		case GREATER_THAN_OR_EQUAL : {
 	    			Object argument = arguments.get(0);
-	    			return createGreaterEqual(propertyPath, (Number)argument, manager);
+	    			if(argument instanceof Comparable) {
+	    				return createGreaterEqual(propertyPath, (Comparable) argument, manager);
+	    			} else {
+	    				return createGreaterEqual(propertyPath, (Number)argument, manager);
+	    			}
 	    		}
 	    		case LESS_THAN : {
 	    			Object argument = arguments.get(0);
-	    			return createLessThan(propertyPath, (Number)argument, manager);
+	    			if(argument instanceof Comparable) {
+	    				return createLessThan(propertyPath, (Comparable) argument, manager);
+	    			} else {
+	    				return createLessThan(propertyPath, (Number)argument, manager);
+	    			}
 	    		}
 	    		case LESS_THAN_OR_EQUAL : {
 	    			Object argument = arguments.get(0);
 	    			if(argument instanceof Comparable) {
-	    				return createLessEqualComparable(propertyPath, (Comparable) argument, manager);
-	    			}
-	    			else {
+	    				return createLessEqual(propertyPath, (Comparable) argument, manager);
+	    			} else {
 	    				return createLessEqual(propertyPath, (Number) argument, manager);
 	    			}
 	    		}
@@ -363,6 +374,19 @@ public final class PredicateBuilder {
     	CriteriaBuilder builder = manager.getCriteriaBuilder();
         return builder.gt(propertyPath, argument);
     }
+    
+    /**
+     * Apply a "greater than" constraint to the property path.
+     *
+     * @param propertyPath  Property path that we want to compare.
+     * @param argument      Argument Comparable.
+     * @param manager       JPA EntityManager.
+     * @return              Predicate a predicate representation.
+     */
+    private static <T extends Comparable<? super T>> Predicate createGreaterThan(Expression<T> propertyPath, T argument, EntityManager manager) {
+    	CriteriaBuilder builder = manager.getCriteriaBuilder();
+        return builder.greaterThan(propertyPath, argument);
+    }
 
     /**
      * Apply a "greater than or equal" constraint to the property path.
@@ -376,6 +400,19 @@ public final class PredicateBuilder {
     	CriteriaBuilder builder = manager.getCriteriaBuilder();
         return builder.ge(propertyPath, argument);
     }
+    
+    /**
+     * Apply a "greater than or equal" constraint to the property path.
+     *
+     * @param propertyPath  Property path that we want to compare.
+     * @param argument      Argument Comparable.
+     * @param manager       JPA EntityManager.
+     * @return              Predicate a predicate representation.
+     */
+    private static <T extends Comparable<? super T>> Predicate createGreaterEqual(Expression<T> propertyPath, T argument, EntityManager manager) {
+    	CriteriaBuilder builder = manager.getCriteriaBuilder();
+        return builder.greaterThanOrEqualTo(propertyPath, argument);
+    }
 
     /**
      * Apply a "less than" constraint to the property path.
@@ -388,6 +425,19 @@ public final class PredicateBuilder {
     private static Predicate createLessThan(Expression<? extends Number> propertyPath, Number argument, EntityManager manager) {
     	CriteriaBuilder builder = manager.getCriteriaBuilder();
         return builder.lt(propertyPath, argument);
+    }
+    
+    /**
+     * Apply a "less than" constraint to the property path.
+     *
+     * @param propertyPath  Property path that we want to compare.
+     * @param argument      Argument Comparable.
+     * @param manager       JPA EntityManager.
+     * @return              Predicate a predicate representation.
+     */
+    private static <T extends Comparable<? super T>> Predicate createLessThan(Expression<T> propertyPath, T argument, EntityManager manager) {
+    	CriteriaBuilder builder = manager.getCriteriaBuilder();
+        return builder.lessThan(propertyPath, argument);
     }
 
     /**
@@ -403,7 +453,15 @@ public final class PredicateBuilder {
         return builder.le(propertyPath, argument);
     }
     
-    private static <T extends Comparable<? super T>> Predicate createLessEqualComparable(Expression<T> propertyPath, T argument, EntityManager manager) {
+    /**
+     * Apply a "less than or equal" constraint to the property path.
+     *
+     * @param propertyPath  Property path that we want to compare.
+     * @param argument      Argument Comparable.
+     * @param manager       JPA EntityManager.
+     * @return              Predicate a predicate representation.
+     */
+    private static <T extends Comparable<? super T>> Predicate createLessEqual(Expression<T> propertyPath, T argument, EntityManager manager) {
     	CriteriaBuilder builder = manager.getCriteriaBuilder();
         return builder.lessThanOrEqualTo(propertyPath, argument);
     }

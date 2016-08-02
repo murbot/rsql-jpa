@@ -55,8 +55,15 @@ public class ArgumentFormatException extends RuntimeException {
         this.propertyType = propertyType;
     }
 
+    public ArgumentFormatException(String argument, Class<?> propertyType, Throwable cause) {
+		super("Cannot cast '" + argument + "' to type " + propertyType, cause);
+		this.argument = argument;
+		this.propertyType = propertyType;
+	}
 
-    public String getArgument() {
+
+
+	public String getArgument() {
         return argument;
     }
 

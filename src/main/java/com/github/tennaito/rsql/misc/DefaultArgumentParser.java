@@ -26,6 +26,7 @@ package com.github.tennaito.rsql.misc;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -80,6 +81,11 @@ public class DefaultArgumentParser implements ArgumentParser {
         if (type.equals(Date.class)) {
             return (T) parseDate(argument, type);
         }
+        
+        if (type.equals(Timestamp.class)) {
+        	Date date = parseDate(argument, type);
+        	return (T) new Timestamp(date.getTime());
+        }
 
         // try to parse via valueOf(String s) method
         try {
@@ -87,7 +93,7 @@ public class DefaultArgumentParser implements ArgumentParser {
             Method method = type.getMethod("valueOf", String.class);
             return (T) method.invoke(type, argument);
         } catch (InvocationTargetException ex) {
-        	throw new ArgumentFormatException(argument, type);
+        	throw new ArgumentFormatException(argument, type, ex);
         } catch (ReflectiveOperationException ex) {
         	LOG.log(Level.WARNING, "{0} does not have method valueOf(String s) or method is inaccessible", type);
         	throw new IllegalArgumentException("Cannot parse argument type " + type);
